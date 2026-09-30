@@ -1,98 +1,71 @@
-import * as Device from 'expo-device';
-import { Platform, StyleSheet } from 'react-native';
+import {  StyleSheet, Text, View, FlatList, ListRenderItem} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-import { AnimatedIcon } from '@/components/animated-icon';
-import { HintRow } from '@/components/hint-row';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { WebBadge } from '@/components/web-badge';
-import { BottomTabInset, MaxContentWidth, Spacing } from '@/constants/theme';
-
-function getDevMenuHint() {
-  if (Platform.OS === 'web') {
-    return <ThemedText type="small">use browser devtools</ThemedText>;
-  }
-  if (Device.isDevice) {
-    return (
-      <ThemedText type="small">
-        shake device or press <ThemedText type="code">m</ThemedText> in terminal
-      </ThemedText>
-    );
-  }
-  const shortcut = Platform.OS === 'android' ? 'cmd+m (or ctrl+m)' : 'cmd+d';
-  return (
-    <ThemedText type="small">
-      press <ThemedText type="code">{shortcut}</ThemedText>
-    </ThemedText>
-  );
+type Annonce = {
+  id : string,
+  name : string,
+  prix : number,
+  ville : string
 }
-
+const DATA : Annonce[]= [
+  {id : "1", name : "iPhone 13 - 128 Go", prix : 4500, ville : 'Casablanca'},
+  {id : "2", name : "Canapé d'angle en cuir", prix : 3200, ville : 'Rabat'},
+  {id : "3", name : "Vélo VTT Rockrider", prix : 1800, ville : 'Marrakech'}
+]
 export default function HomeScreen() {
+  const renderItem : ListRenderItem<Annonce> = ({item}) => (
+    <View style={styles.carte}>
+      <View style={styles.photo}></View>
+        <View style={styles.photoInfo}>
+          <Text>{item.name}</Text>
+          <Text>{item.prix} DH</Text>
+          <Text>{item.ville}</Text>
+        </View> 
+    </View>
+  )
   return (
-    <ThemedView style={styles.container}>
-      <SafeAreaView style={styles.safeArea}>
-        <ThemedView style={styles.heroSection}>
-          <AnimatedIcon />
-          <ThemedText type="title" style={styles.title}>
-            Welcome to&nbsp; Souk Application
-          </ThemedText>
-        </ThemedView>
-
-        <ThemedText type="code" style={styles.code}>
-          get started
-        </ThemedText>
-
-        <ThemedView type="backgroundElement" style={styles.stepContainer}>
-          <HintRow
-            title="Try editing"
-            hint={<ThemedText type="code">src/app/index.tsx</ThemedText>}
-          />
-          <HintRow title="Dev tools" hint={getDevMenuHint()} />
-          <HintRow
-            title="Fresh start"
-            hint={<ThemedText type="code">npm run reset-project</ThemedText>}
-          />
-        </ThemedView>
-
-        {Platform.OS === 'web' && <WebBadge />}
-      </SafeAreaView>
-    </ThemedView>
+    
+    <SafeAreaView style={styles.container}>
+      <View style={styles.tete}>
+        <Text style={styles.text1}> Souk </Text>
+        <Text>Bienvenue Chez Souk</Text>
+      </View>
+      <FlatList
+       data = {DATA}
+       renderItem={renderItem}
+       keyExtractor={(item) => item.id}
+      />
+    </SafeAreaView>   
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    flexDirection: 'row',
+  container : {
+    flex : 1,
+    backgroundColor: '#F5F5F5',
   },
-  safeArea: {
-    flex: 1,
-    paddingHorizontal: Spacing.four,
+  tete : {
     alignItems: 'center',
-    gap: Spacing.three,
-    paddingBottom: BottomTabInset + Spacing.three,
-    maxWidth: MaxContentWidth,
+    marginTop : 40,
+    marginBottom : 50
   },
-  heroSection: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-    paddingHorizontal: Spacing.four,
-    gap: Spacing.four,
+  text1 : {
+    fontSize : 32,
+    fontWeight : 'bold',
+    marginBottom : 20
   },
-  title: {
-    textAlign: 'center',
+  carte : {
+    flexDirection : 'row',
+    marginLeft : 20,
+    marginTop: 10
   },
-  code: {
-    textTransform: 'uppercase',
+  photo : {
+    marginRight : 40,
+    width : 80,
+    height : 80,
+    backgroundColor : 'black',
+    borderRadius : 10,
   },
-  stepContainer: {
-    gap: Spacing.three,
-    alignSelf: 'stretch',
-    paddingHorizontal: Spacing.three,
-    paddingVertical: Spacing.four,
-    borderRadius: Spacing.four,
-  },
+  photoInfo : {
+    marginTop : 15
+  }
 });
