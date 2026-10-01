@@ -1,7 +1,7 @@
+import AnnonceCarte from '@/components/annonce-card';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AnnonceCarte from '../components/annonce-card';
-import { DATA } from '../types/annonce';
+import { DATA } from '../../types/annonce';
 
 export default function HomeScreen() {
   return (
