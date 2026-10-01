@@ -1,12 +1,8 @@
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AnnonceCarte from '../components/annonce-card';
-import { Annonce } from '../types/annonce';
-const DATA : Annonce[]= [
-  {id : "1", name : "iPhone 13 - 128 Go", prix : 4500, ville : 'Casablanca'},
-  {id : "2", name : "Canapé d'angle en cuir", prix : 3200, ville : 'Rabat'},
-  {id : "3", name : "Vélo VTT Rockrider", prix : 1800, ville : 'Marrakech'}
-]
+import { DATA } from '../types/annonce';
+
 export default function HomeScreen() {
   return (
     

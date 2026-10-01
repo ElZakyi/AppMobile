@@ -1,16 +1,20 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Annonce } from "../types/annonce";
 
 export default function AnnonceCarte( {item} : {item : Annonce}){
     return (
-        <View style={styles.carte}>
+      <Pressable onPress={() => console.log(`Le nom du produit :  ${item.name} , son prix est : ${item.prix} , ville : ${item.ville} `)}
+                 style = {({pressed}) => [
+                  styles.carte ,
+                  {backgroundColor : pressed? '#e0e0e0' : '#FFF'}
+                 ]}>
             <View style={styles.photo}></View>
             <View style={styles.photoInfo}>
                 <Text>{item.name}</Text>
                 <Text>{item.prix} DH</Text>
                 <Text>{item.ville}</Text>
             </View>
-        </View>
+      </Pressable>
     )
 }
 const styles = StyleSheet.create({
