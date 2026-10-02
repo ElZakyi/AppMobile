@@ -1,10 +1,10 @@
+import { Annonce } from "@/types/annonce";
 import { router } from "expo-router";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { Annonce } from "../types/annonce";
 
 export default function AnnonceCarte( {item} : {item : Annonce}){
     return (
-      <Pressable onPress={() => router.push({pathname:'../annonce/[id]', params:{id : item.id}})}
+      <Pressable onPress={() => router.push({pathname:'/annonce/[id]', params:{id : item.id}})}
                  style = {({pressed}) => [
                   styles.carte ,
                   {backgroundColor : pressed? '#e0e0e0' : '#FFF'}
