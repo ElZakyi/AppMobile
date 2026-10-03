@@ -1,4 +1,6 @@
 import AnnonceCarte from "@/components/annonce-card";
+import {useAnnonce} from "@/store/annonce-store";
+import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
@@ -6,7 +8,8 @@ export default function PubScreen(){
     const [name, setname] = useState("");
     const [prix, setPrix] = useState("");
     const [ville, setVille] = useState("");
-    const annonce = {id:"appercu", name: name, prix:Number(prix), ville:ville};
+    const annonce = {id:Date.now().toString(), name: name, prix:Number(prix), ville:ville};
+    const {addAnnonce} = useAnnonce();
     const handlePublish = () => {
         if(name.trim() === "" || prix.trim() === "" || ville.trim() === ""){
             Alert.alert("Erreur","Champs manquant !");
@@ -16,10 +19,12 @@ export default function PubScreen(){
             Alert.alert("Veuillez saisir un namebre valide");
             return;
         }
+        addAnnonce(annonce);
         Alert.alert("Succes","Votre Annonce a été publiée");
         setname("");
         setPrix("");
         setVille("");
+        router.push("/")
     }
     return (
         <View style = {styles.container}>

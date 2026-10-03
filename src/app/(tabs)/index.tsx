@@ -1,15 +1,17 @@
 import AnnonceCarte from '@/components/annonce-card';
 import { DATA } from '@/data/annonce';
+import {useAnnonce} from '@/store/annonce-store';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
+  const {annonce} = useAnnonce();
   return (
     
     <SafeAreaView style={styles.container}>
       
       <FlatList
-       data = {DATA}
+       data = {annonce}
        renderItem={({item}) => <AnnonceCarte item = {item} />}
        keyExtractor={(item) => item.id}
        ListHeaderComponent={
