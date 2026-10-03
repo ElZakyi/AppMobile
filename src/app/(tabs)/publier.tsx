@@ -3,12 +3,14 @@ import {useAnnonce} from "@/store/annonce-store";
 import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-
+import * as ImagePicker from 'expo-image-picker';
 export default function PubScreen(){
     const [name, setname] = useState("");
     const [prix, setPrix] = useState("");
     const [ville, setVille] = useState("");
-    const annonce = {id:Date.now().toString(), name: name, prix:Number(prix), ville:ville};
+    const [src, setSrc] = useState("");
+    const uniqueId = `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
+    const annonce = {id:uniqueId, name: name, prix:Number(prix), ville:ville, photo : src!==""? src:undefined};
     const {addAnnonce} = useAnnonce();
     const handlePublish = () => {
         if(name.trim() === "" || prix.trim() === "" || ville.trim() === ""){
@@ -24,7 +26,39 @@ export default function PubScreen(){
         setname("");
         setPrix("");
         setVille("");
+        setSrc("");
         router.push("/")
+    }
+    const handleImagePicker = async(mode : string) => {
+        let permissionResult;
+        if(mode === "camera"){
+             permissionResult = await ImagePicker.requestCameraPermissionsAsync(); 
+        }else{
+             permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        }
+        if(permissionResult.status !== 'granted'){
+            Alert.alert("Permission requise !");
+            return;
+        }
+        let resultat;
+        if(mode === 'galerie'){
+              resultat = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes:['images'],
+                allowsEditing: true,
+                aspect: [4,3],
+                quality: 1
+            });
+        }else {
+                resultat = await ImagePicker.launchCameraAsync({
+                mediaTypes: ['images'],
+                allowsEditing: true,
+                aspect: [4, 3],
+                quality: 1,
+            });
+        }
+        if(!resultat.canceled){
+            setSrc(resultat.assets[0].uri);
+        }
     }
     return (
         <View style = {styles.container}>
@@ -41,7 +75,11 @@ export default function PubScreen(){
                     <Text >Ville: </Text>
                     <TextInput style={styles.inputZone} value={ville} placeholder="Ex Casablanca" onChangeText={setVille}/>
                 </View>
+                <View style={styles.buttonBar}>
+                <Pressable onPress={()=>handleImagePicker('galerie')}><Text>charger photo</Text></Pressable>
+                <Pressable onPress={()=>handleImagePicker('camera')}><Text>prendre photo</Text></Pressable>
                 <Pressable style={({pressed})=>([styles.button, pressed&&{opacity:0.8}])} onPress={handlePublish}><Text>Publier</Text></Pressable>
+                </View>
             </View>
             <View >
                 <AnnonceCarte item = {annonce}/>
@@ -50,6 +88,10 @@ export default function PubScreen(){
     )
 }
 const styles = StyleSheet.create({
+    buttonBar:{
+        flex: 1,
+        flexDirection: 'row'
+    },
     container:{
         flex : 1,
         justifyContent: 'center',

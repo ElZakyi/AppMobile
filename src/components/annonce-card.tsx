@@ -1,6 +1,6 @@
 import { Annonce } from "@/types/annonce";
 import { router } from "expo-router";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View,Image } from "react-native";
 
 export default function AnnonceCarte( {item} : {item : Annonce}){
     return (
@@ -9,7 +9,11 @@ export default function AnnonceCarte( {item} : {item : Annonce}){
                   styles.carte ,
                   {backgroundColor : pressed? '#e0e0e0' : '#FFF'}
                  ]}>
-            <View style={styles.photo}></View>
+            {item.photo?(
+              <Image source={{uri:item.photo}} style={styles.photo}/>
+            ):
+            (<View style={styles.photo}></View>)
+            }           
             <View style={styles.photoInfo}>
                 <Text>{item.name}</Text>
                 <Text>{item.prix} DH</Text>
