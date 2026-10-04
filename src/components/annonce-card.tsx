@@ -1,8 +1,12 @@
+import { useAnnonce } from "@/store/annonce-store";
 import { Annonce } from "@/types/annonce";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import { Pressable, StyleSheet, Text, View,Image } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 export default function AnnonceCarte( {item} : {item : Annonce}){
+  const {favorisIds, toogleFavoris} = useAnnonce();
+  const isFavoris = favorisIds.includes(item.id);
     return (
       <Pressable onPress={() => router.push({pathname:'/annonce/[id]', params:{id : item.id}})}
                  style = {({pressed}) => [
@@ -19,6 +23,9 @@ export default function AnnonceCarte( {item} : {item : Annonce}){
                 <Text>{item.prix} DH</Text>
                 <Text>{item.ville}</Text>
             </View>
+            <Pressable style={styles.favorisButton} onPress={(e)=>{e.stopPropagation();toogleFavoris(item.id); }}>
+              <Ionicons name={isFavoris? "heart" : "heart-outline"} size={24} color={isFavoris? "red" : "gray"} />
+            </Pressable>
       </Pressable>
     )
 }
@@ -37,5 +44,9 @@ const styles = StyleSheet.create({
   },
   photoInfo : {
     marginTop : 15
+  },
+  favorisButton : {
+    position:'absolute',
+    right : 15
   }
 })
