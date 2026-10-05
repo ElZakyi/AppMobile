@@ -1,21 +1,18 @@
 import { DATA } from "@/data/annonce";
-import { Annonce } from "@/types/annonce";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { create } from 'zustand';
-
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 interface AnnonceState {
-    annonce : Annonce[]
     favorisIds : string[]
     toogleFavoris : (idFavoris : string) => void
-    addAnnonce : (nouvelleAnnonce : Annonce) => void;
 }
 
-export const useAnnonce = create<AnnonceState>((set)=>({
+export const useAnnonce = create<AnnonceState>()(
+    persist(
+    (set)=>({
     annonce : DATA,
     favorisIds : [],
-    addAnnonce : (nouvelleAnnonce) => set((state) => ({
-        annonce : [nouvelleAnnonce, ...state.annonce]
-    })),
     toogleFavoris : (id) => set((state)=> {
         const exist = state.favorisIds.includes(id);
         if(exist){
@@ -23,5 +20,9 @@ export const useAnnonce = create<AnnonceState>((set)=>({
         }else {
             return {favorisIds : [...state.favorisIds,id]};
         }
-    })
-})) 
+    })}),
+    {
+        name:"annonceStorage",
+        storage: createJSONStorage(()=> AsyncStorage)
+    }
+    ))

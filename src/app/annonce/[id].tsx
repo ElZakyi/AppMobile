@@ -1,11 +1,16 @@
-import { useAnnonce } from "@/store/annonce-store";
+import { fetchAnnonce } from "@/api/annonce";
+import { Annonce } from "@/types/annonce";
+import { useQuery } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { Image, StyleSheet, Text, View } from "react-native";
 
 export default function CarteDetails(){
     const {id} = useLocalSearchParams();
-    const {annonce} = useAnnonce();
-    const produit = annonce.find((item) => item.id === id);
+    const {data: annonce} = useQuery({
+        queryKey:['annonces'],
+        queryFn: fetchAnnonce,
+    })
+    const produit = annonce?.find((item : Annonce) => item.id === id);
     if(!produit){
         return(
             <Text>Annonce non trouvé !</Text>

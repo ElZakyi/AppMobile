@@ -1,11 +1,20 @@
+import { fetchAnnonce } from '@/api/annonce';
 import AnnonceCarte from '@/components/annonce-card';
-import { DATA } from '@/data/annonce';
-import {useAnnonce} from '@/store/annonce-store';
+import { useQuery } from '@tanstack/react-query';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
-  const {annonce} = useAnnonce();
+  const {data : annonce, isLoading, error} = useQuery({
+    queryKey : ['annonces'],
+    queryFn : fetchAnnonce
+  });
+  if (isLoading){
+    return <Text>En cours de chargement ...</Text>
+  }
+  if(error){
+    return <Text>Erreur lors du chargement des données</Text>
+  }
   return (
     
     <SafeAreaView style={styles.container}>

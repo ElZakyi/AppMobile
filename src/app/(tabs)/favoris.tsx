@@ -1,21 +1,18 @@
+import { fetchAnnonce } from "@/api/annonce";
 import AnnonceCarte from "@/components/annonce-card";
-import { DATA } from "@/data/annonce";
 import { useAnnonce } from "@/store/annonce-store";
+import { Annonce } from "@/types/annonce";
+import { useQuery } from "@tanstack/react-query";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context"; // 👈 1. Importez SafeAreaView
 
 export default function FavorisScreen(){
-    const { favorisIds, annonce } = useAnnonce();
-    
-    const allAnnonce = [...annonce, ...DATA];
-
-    const uniqueAnnonces = allAnnonce.filter(
-        (item, index, self) => index === self.findIndex((t) => t.id === item.id)
-    );
-
-    const filtredFavorisAnnonce = uniqueAnnonces.filter((item) => 
-        favorisIds.includes(item.id)
-    );
+    const { favorisIds } = useAnnonce();
+    const {data : annonce} = useQuery({
+        queryKey:['annonces'],
+        queryFn : fetchAnnonce,
+    });
+    const filtredFavorisAnnonce = annonce?.filter((item : Annonce) => favorisIds.includes(item.id)) ?? [];
 
     return (
         // 2. Utilisez SafeAreaView à la place de View pour respecter les bordures de l'écran

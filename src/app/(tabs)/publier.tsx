@@ -1,17 +1,26 @@
+import { fetchAnnonce } from "@/api/annonce";
 import AnnonceCarte from "@/components/annonce-card";
-import {useAnnonce} from "@/store/annonce-store";
+import { useQuery } from "@tanstack/react-query";
+import * as ImagePicker from 'expo-image-picker';
 import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
-import * as ImagePicker from 'expo-image-picker';
 export default function PubScreen(){
     const [name, setname] = useState("");
     const [prix, setPrix] = useState("");
     const [ville, setVille] = useState("");
     const [src, setSrc] = useState("");
-    const uniqueId = `${Date.now()}-${Math.floor(Math.random() * 10000)}`;
-    const annonce = {id:uniqueId, name: name, prix:Number(prix), ville:ville, photo : src!==""? src:undefined};
-    const {addAnnonce} = useAnnonce();
+    const previewAnnonce = {
+    id: 'preview',
+    name: name,
+    prix: Number(prix),
+    ville: ville,
+    photo: src,
+};
+    const {data : annonce} = useQuery({
+        queryKey: ['annonces'],
+        queryFn : fetchAnnonce,
+    })
     const handlePublish = () => {
         if(name.trim() === "" || prix.trim() === "" || ville.trim() === ""){
             Alert.alert("Erreur","Champs manquant !");
@@ -21,7 +30,6 @@ export default function PubScreen(){
             Alert.alert("Veuillez saisir un namebre valide");
             return;
         }
-        addAnnonce(annonce);
         Alert.alert("Succes","Votre Annonce a été publiée");
         setname("");
         setPrix("");
@@ -82,7 +90,7 @@ export default function PubScreen(){
                 </View>
             </View>
             <View >
-                <AnnonceCarte item = {annonce}/>
+                <AnnonceCarte item = {previewAnnonce}/>
             </View>
         </View>
     )
