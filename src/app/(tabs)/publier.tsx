@@ -1,6 +1,7 @@
-import { fetchAnnonce } from "@/api/annonce";
+import { createAnnonce } from "@/api/annonce";
 import AnnonceCarte from "@/components/annonce-card";
-import { useQuery } from "@tanstack/react-query";
+import { Annonce } from "@/types/annonce";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from 'expo-image-picker';
 import { router } from "expo-router";
 import { useState } from "react";
@@ -16,10 +17,23 @@ export default function PubScreen(){
     prix: Number(prix),
     ville: ville,
     photo: src,
-};
-    const {data : annonce} = useQuery({
-        queryKey: ['annonces'],
-        queryFn : fetchAnnonce,
+    };
+    const {id, ...donneesAEnvoyer} = previewAnnonce;
+    const queryClient = useQueryClient();
+    const mutation = useMutation({
+        mutationFn: (nouvelleAnnonce :Omit<Annonce, 'id'> ) => createAnnonce(nouvelleAnnonce),
+        onSuccess : () => {
+            queryClient.invalidateQueries({queryKey: ['annonces']});
+            router.push("/");
+            setname("");
+            setPrix("");
+            setVille("");
+            setSrc("");
+            Alert.alert("Annonce a été crée avec succés !");
+        },
+        onError : ()=>{
+            Alert.alert("Erreur","Impossible de publier l'annonce");
+        }
     })
     const handlePublish = () => {
         if(name.trim() === "" || prix.trim() === "" || ville.trim() === ""){
@@ -30,12 +44,8 @@ export default function PubScreen(){
             Alert.alert("Veuillez saisir un namebre valide");
             return;
         }
-        Alert.alert("Succes","Votre Annonce a été publiée");
-        setname("");
-        setPrix("");
-        setVille("");
-        setSrc("");
-        router.push("/")
+        mutation.mutate(donneesAEnvoyer);
+        
     }
     const handleImagePicker = async(mode : string) => {
         let permissionResult;
@@ -86,7 +96,7 @@ export default function PubScreen(){
                 <View style={styles.buttonBar}>
                 <Pressable onPress={()=>handleImagePicker('galerie')}><Text>charger photo</Text></Pressable>
                 <Pressable onPress={()=>handleImagePicker('camera')}><Text>prendre photo</Text></Pressable>
-                <Pressable style={({pressed})=>([styles.button, pressed&&{opacity:0.8}])} onPress={handlePublish}><Text>Publier</Text></Pressable>
+                <Pressable disabled = {mutation.isPending} style={({pressed})=>( mutation.isPending? undefined : styles.button)} onPress={handlePublish}><Text>{mutation.isPending? "Publication ..." : "publier"}</Text></Pressable>
                 </View>
             </View>
             <View >
