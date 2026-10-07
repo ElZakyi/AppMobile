@@ -1,4 +1,5 @@
 import { Annonce } from "@/types/annonce";
+import { User } from "@/types/user";
 
 export async function fetchAnnonce(){
     const reponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/annonces`);
@@ -29,4 +30,15 @@ export async function createAnnonce(nouvelleAnnonce : Omit<Annonce,'id'>){
     }else {
         return reponse.json();
     }
+}
+export async function connexion(user : User){
+    const reponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/login`,{
+        method: 'POST',
+        headers : {'Content-Type' : 'application/json'},
+        body : JSON.stringify(user)
+    })
+    if(!reponse.ok){
+        throw new Error("Email ou mot de passe incorrect !");
+    }
+    return reponse.json();
 }
