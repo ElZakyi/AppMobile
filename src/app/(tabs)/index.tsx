@@ -1,53 +1,77 @@
 import { fetchAnnonce } from '@/api/annonce';
 import AnnonceCarte from '@/components/annonce-card';
 import { useQuery } from '@tanstack/react-query';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
-  const {data : annonce, isLoading, error} = useQuery({
-    queryKey : ['annonces'],
-    queryFn : fetchAnnonce
+  const { data: annonce, isLoading, error } = useQuery({
+    queryKey: ['annonces'],
+    queryFn: fetchAnnonce
   });
-  if (isLoading){
-    return <Text>En cours de chargement ...</Text>
-  }
-  if(error){
-    return <Text>Erreur lors du chargement des données</Text>
-  }
-  return (
-    
-    <SafeAreaView style={styles.container}>
-      
-      <FlatList
-       data = {annonce}
-       renderItem={({item}) => <AnnonceCarte item = {item} />}
-       keyExtractor={(item) => item.id}
-       ListHeaderComponent={
-       <View style={styles.tete}>
-        <Text style={styles.text1}> Souk </Text>
-        <Text>Bienvenue Chez Souk</Text>
+
+  if (isLoading) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#ff5722" />
       </View>
-      }
+    );
+  }
+
+  if (error) {
+    return (
+      <View style={styles.centered}>
+        <Text style={styles.errorText}>Erreur lors du chargement des données</Text>
+      </View>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <FlatList
+        data={annonce}
+        renderItem={({ item }) => <AnnonceCarte item={item} />}
+        keyExtractor={(item) => item.id}
+        ListHeaderComponent={
+          <View style={styles.tete}>
+            <Text style={styles.text1}>Souk</Text>
+            <Text style={styles.sousTitre}>Bienvenue Chez Souk</Text>
+          </View>
+        }
       />
-    </SafeAreaView>   
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container : {
-    flex : 1,
-    backgroundColor: '#F5F5F5',
+  container: {
+    flex: 1,
+    backgroundColor: '#F8F9FA',
   },
-  tete : {
+  tete: {
     alignItems: 'center',
-    marginTop : 40,
-    marginBottom : 50
+    marginTop: 30,
+    marginBottom: 30,
+    paddingHorizontal: 20,
   },
-  text1 : {
-    fontSize : 32,
-    fontWeight : 'bold',
-    marginBottom : 20
+  text1: {
+    fontSize: 34,
+    fontWeight: '800',
+    color: '#1A1A1A',
+    marginBottom: 6,
   },
- 
+  sousTitre: {
+    fontSize: 15,
+    color: '#888',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F8F9FA',
+  },
+  errorText: {
+    fontSize: 15,
+    color: '#e53935',
+  },
 });
