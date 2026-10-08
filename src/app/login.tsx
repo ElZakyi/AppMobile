@@ -1,8 +1,8 @@
 import { connexion } from "@/api/auth";
+import { useAuth } from "@/store/auth-store";
 import { User } from "@/types/user";
 import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
-import * as SecureStore from 'expo-secure-store';
 import { useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, TextInput } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -16,7 +16,7 @@ export default function LoginScreen(){
         onSuccess : async(data) => {
             const token = data.access_token;
             if(token){
-                await SecureStore.setItemAsync('user-token',token);
+                await useAuth.getState().login(token);
             }
             setEmail("");
             setPassword("");

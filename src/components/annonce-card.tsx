@@ -1,12 +1,26 @@
+import { deleteAnnonce } from "@/api/annonce";
 import { useAnnonce } from "@/store/annonce-store";
 import { Annonce } from "@/types/annonce";
 import { Ionicons } from "@expo/vector-icons";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
-import { Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 
-export default function AnnonceCarte({ item }: { item: Annonce }) {
+export default function AnnonceCarte({ item , showDeleteButton } : { item: Annonce , showDeleteButton? : boolean}) {
   const { favorisIds, toogleFavoris } = useAnnonce();
   const isFavoris = favorisIds.includes(item.id);
+  const queryClient = useQueryClient();
+  const mutation = useMutation({
+    mutationFn: () => deleteAnnonce(item.id),
+    onSuccess : () => {
+      queryClient.invalidateQueries({queryKey: ['auth-annonces']});
+      queryClient.invalidateQueries({queryKey: ['annonces']});
+      Alert.alert("Annonce supprimée avec succées !"); 
+    },
+    onError : () => {
+      throw new Error( "Impossible de supprimer l'annonce");
+    }
+  })
 
   return (
     <Pressable
@@ -32,11 +46,22 @@ export default function AnnonceCarte({ item }: { item: Annonce }) {
       >
         <Ionicons name={isFavoris ? "heart" : "heart-outline"} size={24} color={isFavoris ? "#ff5722" : "#aaa"} />
       </Pressable>
-    </Pressable>
+      <Pressable style={styles.deleteButton} onPress={() => Alert.alert(
+        "Titre","Message",
+        [{ text: "Annuler", style: "cancel" },{ text: "Supprimer", onPress: () => mutation.mutate(), style: "destructive" }])}>
+        {showDeleteButton && <Ionicons name={ "remove-circle-outline"}/>}
+      </Pressable>
+      </Pressable>
+
   );
 }
 
 const styles = StyleSheet.create({
+  deleteButton: {
+    position: 'absolute',
+    bottom: 12,
+    right: 12,
+},
   carte: {
     flexDirection: 'row',
     marginHorizontal: 16,

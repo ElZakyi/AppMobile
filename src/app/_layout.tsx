@@ -1,3 +1,4 @@
+import { useAuth } from '@/store/auth-store';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { router, Stack } from "expo-router";
 import { useEffect } from 'react';
@@ -5,7 +6,15 @@ const queryClient = new QueryClient();
 
 export default function RootLayout(){
     useEffect(() => {
-    router.replace('/login');
+    const  init = async() => {
+        await useAuth.getState().loadToken();
+        if(useAuth.getState().token === null){
+            router.replace("/login");
+        }else{
+            router.replace("/");
+        }
+    }
+    init();
 }, []);
     return (
         <QueryClientProvider client={queryClient}>
