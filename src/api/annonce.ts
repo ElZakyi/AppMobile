@@ -56,5 +56,21 @@ export async function deleteAnnonce(idAnnonce: string){
     }else{
         return {"message" : "Annonce supprimée avec succés !"};
     }
+}   
+export async function uploadPhoto(uri : string){
+    const token = useAuth.getState().token
+    const formData = new FormData();
+    const fichierReponse = await fetch(uri);
+    const blob = await fichierReponse.blob();
+    formData.append('file', blob, 'photo.jpg');
+    const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/annonces/upload`,{
+        method: 'POST',
+        headers: {'Authorization': `Bearer ${token}` },
+        body : formData
+    })
+    if(!response.ok){
+        throw new Error("Impossible de charger l'image");
+    }else{
+        return response.json();
+    }
 }
-

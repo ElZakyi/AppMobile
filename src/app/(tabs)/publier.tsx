@@ -1,4 +1,4 @@
-import { createAnnonce } from "@/api/annonce";
+import { createAnnonce, uploadPhoto } from "@/api/annonce";
 import AnnonceCarte from "@/components/annonce-card";
 import { Annonce } from "@/types/annonce";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -28,6 +28,7 @@ export default function PubScreen() {
     mutationFn: (nouvelleAnnonce: Omit<Annonce, 'id'>) => createAnnonce(nouvelleAnnonce),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['annonces'] });
+      queryClient.invalidateQueries({queryKey: ['auth-annonces']})
       router.push("/");
       setname("");
       setPrix("");
@@ -40,7 +41,7 @@ export default function PubScreen() {
     }
   });
 
-  const handlePublish = () => {
+  const  handlePublish = async () => {
     if (name.trim() === "" || prix.trim() === "" || ville.trim() === "") {
       Alert.alert("Erreur", "Champs manquant !");
       return;
@@ -49,7 +50,12 @@ export default function PubScreen() {
       Alert.alert("Veuillez saisir un nombre valide");
       return;
     }
-    mutation.mutate(donneesAEnvoyer);
+    let photoUrl = donneesAEnvoyer.photo;
+    if(src){
+      const resultatUpload = await uploadPhoto(photoUrl);
+      photoUrl = resultatUpload.url;
+    }
+    mutation.mutate({...donneesAEnvoyer, photo: photoUrl});
   };
 
   const handleImagePicker = async (mode: string) => {

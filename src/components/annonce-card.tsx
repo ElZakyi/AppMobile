@@ -47,7 +47,7 @@ export default function AnnonceCarte({ item , showDeleteButton } : { item: Annon
         <Ionicons name={isFavoris ? "heart" : "heart-outline"} size={24} color={isFavoris ? "#ff5722" : "#aaa"} />
       </Pressable>
       <Pressable style={styles.deleteButton} onPress={() => Alert.alert(
-        "Titre","Message",
+        "Supprésion","Etes-vous sûr de supprimer l'annonce",
         [{ text: "Annuler", style: "cancel" },{ text: "Supprimer", onPress: () => mutation.mutate(), style: "destructive" }])}>
         {showDeleteButton && <Ionicons name={ "remove-circle-outline"}/>}
       </Pressable>
