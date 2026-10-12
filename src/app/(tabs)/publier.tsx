@@ -3,6 +3,7 @@ import AnnonceCarte from "@/components/annonce-card";
 import { Annonce } from "@/types/annonce";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import * as ImagePicker from 'expo-image-picker';
+import * as Location from 'expo-location';
 import { router } from "expo-router";
 import { useState } from "react";
 import { Alert, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
@@ -89,7 +90,16 @@ export default function PubScreen() {
       setSrc(resultat.assets[0].uri);
     }
   };
-
+  const handleLocalisation = async() => {
+    const permissionResult =  await Location.requestForegroundPermissionsAsync();
+    if(permissionResult.status !== 'granted'){
+      Alert.alert("Erreur","Permission non accordée");
+      return;
+    }
+    const result = await Location.getCurrentPositionAsync();
+    const villeResult = await Location.reverseGeocodeAsync(result.coords);
+    setVille(villeResult[0]?.city ?? "");
+  }
   return (
     <View style={styles.container}>
       <View style={styles.formBox}>
@@ -101,9 +111,11 @@ export default function PubScreen() {
           <Text style={styles.labelZone}>Prix</Text>
           <TextInput keyboardType="numeric" style={styles.inputZone} value={prix} placeholder="Ex 1000" onChangeText={setPrix} />
         </View>
-        <View style={styles.textZone}>
-          <Text style={styles.labelZone}>Ville</Text>
-          <TextInput style={styles.inputZone} value={ville} placeholder="Ex Casablanca" onChangeText={setVille} />
+        <View style={styles.villeRow}>
+          <TextInput style={styles.inputZoneVille} value={ville} placeholder="Ex Casablanca" onChangeText={setVille} />
+          <Pressable style={styles.locationButton} onPress={handleLocalisation}>
+            <Text style={styles.locationButtonText}>📍 Ma position</Text>
+          </Pressable>
         </View>
         <View style={styles.photoBar}>
           <Pressable style={styles.photoButton} onPress={() => handleImagePicker('galerie')}>
@@ -202,5 +214,29 @@ const styles = StyleSheet.create({
   },
   apercuBox: {
     width: '88%',
+  },
+  villeRow: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 8,
+  },
+  inputZoneVille: {
+    flex: 1,
+    color: '#1A1A1A',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+    paddingVertical: 6,
+    fontSize: 15,
+  },
+  locationButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    backgroundColor: '#FFF3EC',
+  },
+  locationButtonText: {
+    color: '#ff5722',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });

@@ -1,10 +1,11 @@
 import { useAuth } from "@/store/auth-store";
 import { Annonce } from "@/types/annonce";
+import { fetchAPI } from "./client";
 
 
 export async function fetchAnnonce(){
     const reponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/annonces`);
-    if(reponse.ok === false){
+    if(!reponse.ok){
         throw new Error("Erreur lors du fetch des données");
     }else{
         return reponse.json();
@@ -22,7 +23,7 @@ export async function fetchAnnonceById(id : string){
 
 export async function createAnnonce(nouvelleAnnonce : Omit<Annonce,'id'>){
     const token = useAuth.getState().token
-    const reponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/annonces`, {
+    const reponse = await fetchAPI(`${process.env.EXPO_PUBLIC_API_URL}/annonces`, {
         method: 'POST',
         headers : {'Content-Type': 'application/json', 'Authorization' : `Bearer ${token}`},
         body : JSON.stringify(nouvelleAnnonce),
@@ -35,7 +36,7 @@ export async function createAnnonce(nouvelleAnnonce : Omit<Annonce,'id'>){
 }
 export async function fetchAnnonceByAuth(){
     const token = useAuth.getState().token
-    const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/annonces/me`,{
+    const response = await fetchAPI(`${process.env.EXPO_PUBLIC_API_URL}/annonces/me`,{
         method:'GET',
         headers:{'Content-Type' : 'application/json', 'Authorization' : `Bearer ${token}`}
     })
@@ -47,7 +48,7 @@ export async function fetchAnnonceByAuth(){
 }
 export async function deleteAnnonce(idAnnonce: string){
     const token = useAuth.getState().token
-    const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/annonces/${idAnnonce}`,{
+    const response = await fetchAPI(`${process.env.EXPO_PUBLIC_API_URL}/annonces/${idAnnonce}`,{
         method: 'DELETE',
         headers: {'Content-Type' : 'application/json', 'Authorization' : `Bearer ${token}`}
     })
@@ -63,7 +64,7 @@ export async function uploadPhoto(uri : string){
     const fichierReponse = await fetch(uri);
     const blob = await fichierReponse.blob();
     formData.append('file', blob, 'photo.jpg');
-    const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/annonces/upload`,{
+    const response = await fetchAPI(`${process.env.EXPO_PUBLIC_API_URL}/annonces/upload`,{
         method: 'POST',
         headers: {'Authorization': `Bearer ${token}` },
         body : formData

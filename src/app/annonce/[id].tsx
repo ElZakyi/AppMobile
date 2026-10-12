@@ -1,15 +1,27 @@
 import { fetchAnnonceById } from "@/api/annonce";
-import { useQuery } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
-import { ActivityIndicator, Image, StyleSheet, Text, View } from "react-native";
-
+import { createConversation } from "@/api/conversation";
+import { useAuth } from "@/store/auth-store";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { router, useLocalSearchParams } from "expo-router";
+import { ActivityIndicator, Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 export default function CarteDetails() {
   const { id } = useLocalSearchParams();
+  const idUserActif = useAuth().userId;
   const { data: annonce, isLoading, isError } = useQuery({
     queryKey: ['annonce', id],
     queryFn: () => fetchAnnonceById(id as string),
   });
-
+  const mutation = useMutation({
+    mutationFn: () => createConversation(annonce.author.id as string),
+    onSuccess : ()=>{
+      Alert.alert("Vous debutez la conversation avec succés");
+      router.push("/(tabs)/conversations");
+    },
+    onError : (error) => {
+      console.log(error);
+      Alert.alert("Impossible de debuter une conversation");
+    }
+  })
   if (isLoading) {
     return (
       <View style={styles.centered}>
@@ -44,6 +56,7 @@ export default function CarteDetails() {
       <Text style={styles.nom}>{annonce.name}</Text>
       <Text style={styles.prix}>{annonce.prix} DH</Text>
       <Text style={styles.ville}>{annonce.ville}</Text>
+      {idUserActif !== annonce.author.id && <Pressable onPress={() => mutation.mutate()}><Text>Debuter une conversation</Text></Pressable>}
     </View>
   );
 }
