@@ -1,3 +1,4 @@
+import { registerPushToken } from '@/lib/notifications';
 import { useAuth } from '@/store/auth-store';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { router, Stack } from "expo-router";
@@ -12,6 +13,7 @@ export default function RootLayout(){
             router.replace("/login");
         }else{
             router.replace("/");
+            await registerPushToken();
         }
     }
     init();

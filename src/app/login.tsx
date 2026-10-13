@@ -1,6 +1,6 @@
 import { connexion } from "@/api/auth";
+import { registerPushToken } from "@/lib/notifications";
 import { useAuth } from "@/store/auth-store";
-import { User } from "@/types/user";
 import { useMutation } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { useState } from "react";
@@ -12,7 +12,7 @@ export default function LoginScreen(){
     const [password, setPassword] = useState("");
     const loginUserDTO = {email : email, password:password};
     const mutation = useMutation({
-        mutationFn : (loginUserDTO : User) => connexion(loginUserDTO),
+        mutationFn : (loginUserDTO : {email: string, password: string}) => connexion(loginUserDTO),
         onSuccess : async(data) => {
             const token = data.access_token;
             if(token){
@@ -20,13 +20,14 @@ export default function LoginScreen(){
             }
             setEmail("");
             setPassword("");
+            await registerPushToken();
             router.push("/");
         },
         onError : () => {
             Alert.alert("Erreur", "Impossible de se connecter");
         }
     })
-    const login = () => {
+    const login = async() => {
         if (email.trim() === "" || password.trim() === "") {
             Alert.alert("Erreur", "Champs manquant !");
             return;

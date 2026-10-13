@@ -1,4 +1,8 @@
 export type User = {
-    email : string
-    password: string
+    id: string,
+    name: string,
+    email: string,
+    password: string,
+    createdAt: Date,
+    pushToken?: string
 }

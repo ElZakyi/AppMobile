@@ -1,6 +1,5 @@
 import { RegisterUser } from "@/types/registerUser";
-import { User } from "@/types/user";
-export async function connexion(user : User){
+export async function connexion(user : {email: string, password: string}){
     const reponse = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/auth/login`,{
         method: 'POST',
         headers : {'Content-Type' : 'application/json'},
