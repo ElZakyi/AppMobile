@@ -13,6 +13,7 @@ export default function PubScreen() {
   const [prix, setPrix] = useState("");
   const [ville, setVille] = useState("");
   const [src, setSrc] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
 
   const previewAnnonce = {
     id: 'preview',
@@ -35,9 +36,11 @@ export default function PubScreen() {
       setPrix("");
       setVille("");
       setSrc("");
+      setIsUploading(false);
       Alert.alert("Annonce a été crée avec succés !");
     },
     onError: () => {
+      setIsUploading(false);
       Alert.alert("Erreur", "Impossible de publier l'annonce");
     }
   });
@@ -53,6 +56,7 @@ export default function PubScreen() {
     }
     let photoUrl = donneesAEnvoyer.photo;
     if(src){
+      setIsUploading(true);
       const resultatUpload = await uploadPhoto(photoUrl);
       photoUrl = resultatUpload.url;
     }
@@ -76,14 +80,14 @@ export default function PubScreen() {
         mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 1
+        quality: 0.5
       });
     } else {
       resultat = await ImagePicker.launchCameraAsync({
         mediaTypes: ['images'],
         allowsEditing: true,
         aspect: [4, 3],
-        quality: 1,
+        quality: 0.5,
       });
     }
     if (!resultat.canceled) {
@@ -126,11 +130,11 @@ export default function PubScreen() {
           </Pressable>
         </View>
         <Pressable
-          disabled={mutation.isPending}
+          disabled={mutation.isPending || isUploading}
           style={({ pressed }) => [styles.button, pressed && { opacity: 0.85 }]}
           onPress={handlePublish}
         >
-          <Text style={styles.buttonText}>{mutation.isPending ? "Publication ..." : "Publier"}</Text>
+          <Text style={styles.buttonText}>{mutation.isPending || isUploading ? "Publication ..." : "Publier"}</Text>
         </Pressable>
       </View>
 
